@@ -1,0 +1,7 @@
+{
+  "$schema": "https://getjustd.com",
+  "ui": "app\\components\\ui",
+  "classes": "app/lib/utils",
+  "theme": "Zinc",
+  "css": "app/global.css"
+}

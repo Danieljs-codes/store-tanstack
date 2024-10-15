@@ -1,0 +1,247 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		--light: 223.81 0% 98%;
+		--dark: 239.95 9% 6%;
+		--bg: 0 0% 100%;
+		--fg: 239.93 9% 4%;
+		--overlay: 0 0% 100%;
+		--overlay-fg: 239.93 9% 4%;
+		--primary: 240.02 6% 10%;
+		--primary-fg: 0 0% 100%;
+		--secondary: 240 4% 96%;
+		--secondary-fg: 240.01 6% 10%;
+		--tertiary: 0 0% 100%;
+		--tertiary-fg: 240 4% 16%;
+		--accent: 240 8% 93%;
+		--accent-fg: 240.02 6% 10%;
+		--accent-subtle: 240 4% 96%;
+		--accent-subtle-fg: 239.93 9% 4%;
+		--success: 161.17 91% 31%;
+		--success-fg: 151.77 82% 96%;
+		--info: 205.77 100% 50%;
+		--info-fg: 0 0% 100%;
+		--muted: 240 6% 90%;
+		--muted-fg: 240 3.83% 46.08%;
+		--danger: 0.01 72% 51%;
+		--danger-fg: 360 86% 97%;
+		--warning: 43.2 96% 56.99%;
+		--warning-fg: 20.91 91% 14.1%;
+		--border: 240 6% 90%;
+		--input: 240 6% 90%;
+		--ring: var(--primary);
+		--toggle: 240.01 5% 84%;
+		--radius: 0.5rem;
+		--primary-chart: 240.06 6% 24%;
+		--secondary-chart: 239.96 4% 52%;
+		--tertiary-chart: 240 5.03% 64.9%;
+		--highlight-chart: 239.99 4% 84%;
+		--accent-chart: 240 4% 96%;
+	}
+
+	.dark {
+		--bg: 240 10% 2.92%;
+		--fg: 223.81 0% 98%;
+		--primary: 0 0% 100%;
+		--primary-fg: 240.02 6% 10%;
+		--secondary: 239.99 6% 11%;
+		--secondary-fg: 223.81 0% 98%;
+		--tertiary: 240.02 10% 6%;
+		--tertiary-fg: 239.99 4% 96%;
+		--accent: 239.98 4% 15%;
+		--accent-fg: 223.81 0% 98%;
+		--accent-subtle: 240.02 6% 10%;
+		--accent-subtle-fg: 223.81 0% 98%;
+		--overlay: 240.03 6% 6%;
+		--overlay-fg: 223.81 0% 98%;
+		--muted: 239.95 3% 16%;
+		--muted-fg: 240 5.03% 64.9%;
+		--info: 205.77 100% 50%;
+		--info-fg: 0 0% 100%;
+		--success: 161.17 91% 31%;
+		--success-fg: 151.77 82% 96%;
+		--ring: var(--primary);
+		--toggle: 239.99 5% 26%;
+		--border: 240.01 7.1% 15%;
+		--input: 239.95 3% 16%;
+		--primary-chart: 240 4.76% 95.88%;
+		--secondary-chart: 239.92 4% 56.99%;
+		--tertiary-chart: 239.99 5% 67%;
+		--highlight-chart: 239.99 4% 84%;
+		--accent-chart: 240 4% 96%;
+	}
+}
+
+@layer base {
+	html {
+		@apply scroll-smooth;
+	}
+
+	* {
+		@apply border-border;
+		font-feature-settings: "cv11", "ss01";
+		font-variation-settings: "opsz" 850;
+		text-rendering: optimizeLegibility;
+		scrollbar-width: thin;
+	}
+
+	body {
+		@apply bg-bg text-fg;
+	}
+
+	/* dark mode */
+	.dark {
+		scrollbar-width: thin;
+
+		@media (prefers-color-scheme: dark) {
+			* {
+				scrollbar-width: thin;
+			}
+		}
+	}
+
+	/* Chrome, Edge, and Safari */
+	*::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+
+	*::-webkit-scrollbar-track {
+		background: transparent;
+		border-radius: 5px;
+	}
+
+	*::-webkit-scrollbar-thumb {
+		@apply bg-muted;
+		border-radius: 14px;
+		border: 3px solid transparent;
+	}
+}
+
+.react-aria-DropIndicator[data-drop-target] {
+	outline: 1px solid oklch(var(--primary));
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+	transition: background-color 60000000s 0s, color 60000000s 0s;
+}
+
+input[data-autocompleted] {
+	background-color: transparent;
+}
+
+@font-face {
+	font-family: "Geist";
+	src: url(./assets/fonts/GeistVF.woff2) format("woff2-variations"),
+		url(./assets/fonts/GeistVF.woff) format("woff-variations");
+	font-weight: 100 900;
+	font-stretch: 75% 125%;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Geist Mono";
+	src: url(./assets/fonts/GeistMonoVF.woff2) format("woff2-variations"),
+		url(./assets/fonts/GeistMonoVF.woff) format("woff-variations");
+	font-weight: 100 900;
+	font-stretch: 75% 125%;
+	font-style: normal;
+}
+
+:root {
+	font-family: Geist, sans-serif;
+}
+
+/* Make clicks pass-through */
+#nprogress {
+	pointer-events: none;
+}
+
+#nprogress .bar {
+	/* biome-ignore lint/correctness/noUnknownFunction: <explanation> */
+	background: theme("colors.primary.DEFAULT");
+
+	position: fixed;
+	z-index: 1031;
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 2px;
+}
+
+/* Fancy blur effect */
+#nprogress .peg {
+	display: block;
+	position: absolute;
+	right: 0px;
+	width: 100px;
+	height: 100%;
+	/* biome-ignore lint/correctness/noUnknownFunction: <explanation> */
+	box-shadow: 0 0 10px theme("colors.primary.DEFAULT"), 0 0 5px
+		/* biome-ignore lint/correctness/noUnknownFunction: <explanation> */
+		theme("colors.primary.DEFAULT");
+	opacity: 1;
+
+	-webkit-transform: rotate(3deg) translate(0px, -4px);
+	-ms-transform: rotate(3deg) translate(0px, -4px);
+	transform: rotate(3deg) translate(0px, -4px);
+}
+
+/* Remove these to get rid of the spinner */
+#nprogress .spinner {
+	display: block;
+	position: fixed;
+	z-index: 1031;
+	top: 15px;
+	right: 15px;
+}
+
+#nprogress .spinner-icon {
+	width: 18px;
+	height: 18px;
+	box-sizing: border-box;
+
+	border: solid 2px transparent;
+	/* biome-ignore lint/correctness/noUnknownFunction: <explanation> */
+	border-top-color: theme("colors.primary.DEFAULT");
+	/* biome-ignore lint/correctness/noUnknownFunction: <explanation> */
+	border-left-color: theme("colors.primary.DEFAULT");
+	border-radius: 50%;
+
+	-webkit-animation: nprogress-spinner 400ms linear infinite;
+	animation: nprogress-spinner 400ms linear infinite;
+}
+
+.nprogress-custom-parent {
+	overflow: hidden;
+	position: relative;
+}
+
+.nprogress-custom-parent #nprogress .spinner,
+.nprogress-custom-parent #nprogress .bar {
+	position: absolute;
+}
+
+@-webkit-keyframes nprogress-spinner {
+	0% {
+		-webkit-transform: rotate(0deg);
+	}
+	100% {
+		-webkit-transform: rotate(360deg);
+	}
+}
+@keyframes nprogress-spinner {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
