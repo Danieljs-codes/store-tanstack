@@ -1,5 +1,5 @@
 import {protectRoute$} from "@/server/actions/auth";
-import {createStore$} from "@/server/actions/store";
+import {checkStoreExists$, createStore$} from "@/server/actions/store";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {type CreateStoreFormData, createStoreSchema} from "@lib/schema";
 import {useUploadThing} from "@lib/utils/uploadthing";
@@ -19,10 +19,8 @@ import {Controller, useForm} from "react-hook-form";
 
 export const Route = createFileRoute("/create-store")({
     loader: async () => {
-        const user = await protectRoute$()
-
-        console.log(typeof user.session.expiresAt)
-
+        await protectRoute$()
+        await checkStoreExists$()
     },
     component: CreateStore,
 });
