@@ -1,16 +1,57 @@
+import { signUp$ } from "@/server/actions/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { type SignUpFormData, signUpSchema } from "@lib/schema";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/start";
 import { Button } from "@ui/button";
-import { Form } from "@ui/form";
 import { Link } from "@ui/link";
 import { Loader } from "@ui/loader";
+import { Note } from "@ui/note";
 import { TextField } from "@ui/text-field";
+import { Controller, useForm } from "react-hook-form";
 
 export const Route = createFileRoute("/_auth-layout-id/sign-up")({
 	component: SignUp,
 });
 
 function SignUp() {
-	const isPending = false;
+	const signUp = useServerFn(signUp$);
+	const {
+		control,
+		handleSubmit,
+		formState: { errors },
+		setError,
+	} = useForm<SignUpFormData>({
+		resolver: zodResolver(signUpSchema),
+		defaultValues: {
+			firstName: "",
+			lastName: "",
+			email: "",
+			password: "",
+		},
+	});
+
+	const { isPending, mutate } = useMutation({
+		mutationKey: ["sign-up"],
+		mutationFn: async (data: SignUpFormData) => {
+			const res = await signUp(data);
+
+			if (res.success === false) {
+				throw new Error(res.error);
+			}
+
+			return;
+		},
+		onError: (error) => {
+			setError("root", { message: error.message });
+		},
+	});
+
+	const onSubmit = async (data: SignUpFormData) => {
+		mutate(data);
+	};
+
 	return (
 		<div>
 			<div className="text-center mb-6">
@@ -20,28 +61,74 @@ function SignUp() {
 					personalized recommendations
 				</p>
 			</div>
-			<Form>
+			<form onSubmit={handleSubmit(onSubmit)}>
+				{errors.root && <Note intent="danger">{errors.root.message}</Note>}
 				<div className="space-y-5">
-					<TextField
-						label="Name"
-						placeholder="Enter your name"
-						isRequired={true}
+					<Controller
+						name="firstName"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								label="First Name"
+								placeholder="Enter your first name"
+								isInvalid={!!errors.firstName}
+								errorMessage={errors.firstName?.message}
+								isDisabled={isPending}
+								isLoading={isPending}
+								indicatorPlace="suffix"
+								{...field}
+							/>
+						)}
 					/>
-					<TextField
-						label="Email"
-						placeholder="Enter your email"
-						isRequired={true}
-						type="email"
+					<Controller
+						name="lastName"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								label="Last Name"
+								placeholder="Enter your last name"
+								isInvalid={!!errors.lastName}
+								errorMessage={errors.lastName?.message}
+								isDisabled={isPending}
+								isLoading={isPending}
+								indicatorPlace="suffix"
+								{...field}
+							/>
+						)}
 					/>
-					<TextField
-						label="Password"
-						placeholder="Enter your password"
-						isRequired={true}
-						type="password"
-						isRevealable={true}
-						pattern="^.{6,}$"
-						description="Password must be at least 6 characters"
-						descriptionClassName="text-sm text-muted-fg"
+					<Controller
+						name="email"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								label="Email"
+								placeholder="Enter your email"
+								isInvalid={!!errors.email}
+								errorMessage={errors.email?.message}
+								isDisabled={isPending}
+								isLoading={isPending}
+								indicatorPlace="suffix"
+								{...field}
+							/>
+						)}
+					/>
+					<Controller
+						name="password"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								label="Password"
+								type="password"
+								placeholder="Enter your password"
+								isInvalid={!!errors.password}
+								errorMessage={errors.password?.message}
+								isDisabled={isPending}
+								isRevealable={true}
+								isLoading={isPending}
+								indicatorPlace="suffix"
+								{...field}
+							/>
+						)}
 					/>
 				</div>
 				<Button
@@ -51,13 +138,13 @@ function SignUp() {
 					isPending={isPending}
 				>
 					{({ isPending }) =>
-						isPending ? <Loader variant="spin" /> : "Sign up"
+						isPending ? <Loader variant="spin" /> : "Create account"
 					}
 				</Button>
-			</Form>
+			</form>
 			<p className="text-sm text-muted-fg mt-6 text-center">
 				Already have an account?{" "}
-				<Link href="/sign-in" intent={"primary"} className={"font-medium"}>
+				<Link href="/sign-in" intent="primary" className="font-medium">
 					Sign in
 				</Link>
 			</p>

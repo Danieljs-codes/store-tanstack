@@ -1,42 +1,77 @@
+import { createId } from "@paralleldrive/cuid2";
 import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
-	id: text("id").primaryKey(),
-	name: text("name").notNull(),
-	email: text("email").notNull().unique(),
-	emailVerified: boolean("emailVerified").notNull(),
-	image: text("image"),
-	createdAt: timestamp("createdAt").notNull(),
-	updatedAt: timestamp("updatedAt").notNull(),
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => createId()),
+	name: text().notNull(),
+	email: text().notNull().unique(),
+	emailVerified: boolean().notNull(),
+	image: text(),
+	createdAt: timestamp().notNull(),
+	updatedAt: timestamp().notNull(),
 });
 
 export const session = pgTable("session", {
-	id: text("id").primaryKey(),
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	expiresAt: timestamp("expiresAt").notNull(),
 	ipAddress: text("ipAddress"),
 	userAgent: text("userAgent"),
-	userId: text("userId")
+	userId: text()
 		.notNull()
 		.references(() => user.id),
 });
 
 export const account = pgTable("account", {
-	id: text("id").primaryKey(),
-	accountId: text("accountId").notNull(),
-	providerId: text("providerId").notNull(),
-	userId: text("userId")
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => createId()),
+	accountId: text().notNull(),
+	providerId: text().notNull(),
+	userId: text()
 		.notNull()
 		.references(() => user.id),
-	accessToken: text("accessToken"),
-	refreshToken: text("refreshToken"),
-	idToken: text("idToken"),
-	expiresAt: timestamp("expiresAt"),
-	password: text("password"),
+	accessToken: text(),
+	refreshToken: text(),
+	idToken: text(),
+	expiresAt: timestamp(),
+	password: text(),
 });
 
 export const verification = pgTable("verification", {
-	id: text("id").primaryKey(),
-	identifier: text("identifier").notNull(),
-	value: text("value").notNull(),
-	expiresAt: timestamp("expiresAt").notNull(),
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => createId()),
+	identifier: text().notNull(),
+	value: text().notNull(),
+	expiresAt: timestamp().notNull(),
 });
+
+export const store = pgTable("store", {
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => createId()),
+	name: text().notNull(),
+	description: text().notNull(),
+	logo: text(),
+	createdAt: timestamp({ mode: "date", withTimezone: true })
+		.notNull()
+		.defaultNow(),
+	updatedAt: timestamp({ withTimezone: true })
+		.notNull()
+		.$onUpdate(() => new Date()),
+	userId: text()
+		.notNull()
+		.references(() => user.id),
+});
+
+export default {
+	user,
+	session,
+	account,
+	verification,
+	store,
+};

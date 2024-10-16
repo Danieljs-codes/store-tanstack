@@ -11,12 +11,20 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as storecreateImport } from './routes/store/create'
 import { Route as authlayoutImport } from './routes/auth/layout'
 import { Route as indexImport } from './routes/index'
 import { Route as authsignUpImport } from './routes/auth/sign-up'
 import { Route as authsignInImport } from './routes/auth/sign-in'
+import { Route as storedashboardImport } from './routes/store/dashboard'
+import { Route as storedashboardIndexImport } from './routes/store/dashboard-index'
 
 // Create/Update Routes
+
+const storecreateRoute = storecreateImport.update({
+  path: '/create-store',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const authlayoutRoute = authlayoutImport.update({
   id: '/_auth-layout-id',
@@ -38,6 +46,16 @@ const authsignInRoute = authsignInImport.update({
   getParentRoute: () => authlayoutRoute,
 } as any)
 
+const storedashboardRoute = storedashboardImport.update({
+  path: '/store/$storeId/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const storedashboardIndexRoute = storedashboardIndexImport.update({
+  path: '/',
+  getParentRoute: () => storedashboardRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -56,6 +74,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authlayoutImport
       parentRoute: typeof rootRoute
     }
+    '/create-store': {
+      id: '/create-store'
+      path: '/create-store'
+      fullPath: '/create-store'
+      preLoaderRoute: typeof storecreateImport
+      parentRoute: typeof rootRoute
+    }
     '/_auth-layout-id/sign-in': {
       id: '/_auth-layout-id/sign-in'
       path: '/sign-in'
@@ -69,6 +94,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/sign-up'
       preLoaderRoute: typeof authsignUpImport
       parentRoute: typeof authlayoutImport
+    }
+    '/store/$storeId/dashboard': {
+      id: '/store/$storeId/dashboard'
+      path: '/store/$storeId/dashboard'
+      fullPath: '/store/$storeId/dashboard'
+      preLoaderRoute: typeof storedashboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/store/$storeId/dashboard/': {
+      id: '/store/$storeId/dashboard/'
+      path: '/'
+      fullPath: '/store/$storeId/dashboard/'
+      preLoaderRoute: typeof storedashboardIndexImport
+      parentRoute: typeof storedashboardImport
     }
   }
 }
@@ -89,50 +128,90 @@ const authlayoutRouteWithChildren = authlayoutRoute._addFileChildren(
   authlayoutRouteChildren,
 )
 
+interface storedashboardRouteChildren {
+  storedashboardIndexRoute: typeof storedashboardIndexRoute
+}
+
+const storedashboardRouteChildren: storedashboardRouteChildren = {
+  storedashboardIndexRoute: storedashboardIndexRoute,
+}
+
+const storedashboardRouteWithChildren = storedashboardRoute._addFileChildren(
+  storedashboardRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof indexRoute
   '': typeof authlayoutRouteWithChildren
+  '/create-store': typeof storecreateRoute
   '/sign-in': typeof authsignInRoute
   '/sign-up': typeof authsignUpRoute
+  '/store/$storeId/dashboard': typeof storedashboardRouteWithChildren
+  '/store/$storeId/dashboard/': typeof storedashboardIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof indexRoute
   '': typeof authlayoutRouteWithChildren
+  '/create-store': typeof storecreateRoute
   '/sign-in': typeof authsignInRoute
   '/sign-up': typeof authsignUpRoute
+  '/store/$storeId/dashboard': typeof storedashboardIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof indexRoute
   '/_auth-layout-id': typeof authlayoutRouteWithChildren
+  '/create-store': typeof storecreateRoute
   '/_auth-layout-id/sign-in': typeof authsignInRoute
   '/_auth-layout-id/sign-up': typeof authsignUpRoute
+  '/store/$storeId/dashboard': typeof storedashboardRouteWithChildren
+  '/store/$storeId/dashboard/': typeof storedashboardIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/sign-in' | '/sign-up'
+  fullPaths:
+    | '/'
+    | ''
+    | '/create-store'
+    | '/sign-in'
+    | '/sign-up'
+    | '/store/$storeId/dashboard'
+    | '/store/$storeId/dashboard/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/sign-in' | '/sign-up'
+  to:
+    | '/'
+    | ''
+    | '/create-store'
+    | '/sign-in'
+    | '/sign-up'
+    | '/store/$storeId/dashboard'
   id:
     | '__root__'
     | '/'
     | '/_auth-layout-id'
+    | '/create-store'
     | '/_auth-layout-id/sign-in'
     | '/_auth-layout-id/sign-up'
+    | '/store/$storeId/dashboard'
+    | '/store/$storeId/dashboard/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   indexRoute: typeof indexRoute
   authlayoutRoute: typeof authlayoutRouteWithChildren
+  storecreateRoute: typeof storecreateRoute
+  storedashboardRoute: typeof storedashboardRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   indexRoute: indexRoute,
   authlayoutRoute: authlayoutRouteWithChildren,
+  storecreateRoute: storecreateRoute,
+  storedashboardRoute: storedashboardRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -148,7 +227,9 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_auth-layout-id"
+        "/_auth-layout-id",
+        "/create-store",
+        "/store/$storeId/dashboard"
       ]
     },
     "/": {
@@ -161,6 +242,9 @@ export const routeTree = rootRoute
         "/_auth-layout-id/sign-up"
       ]
     },
+    "/create-store": {
+      "filePath": "store\\create.tsx"
+    },
     "/_auth-layout-id/sign-in": {
       "filePath": "auth\\sign-in.tsx",
       "parent": "/_auth-layout-id"
@@ -168,6 +252,16 @@ export const routeTree = rootRoute
     "/_auth-layout-id/sign-up": {
       "filePath": "auth\\sign-up.tsx",
       "parent": "/_auth-layout-id"
+    },
+    "/store/$storeId/dashboard": {
+      "filePath": "store\\dashboard.tsx",
+      "children": [
+        "/store/$storeId/dashboard/"
+      ]
+    },
+    "/store/$storeId/dashboard/": {
+      "filePath": "store\\dashboard-index.tsx",
+      "parent": "/store/$storeId/dashboard"
     }
   }
 }
