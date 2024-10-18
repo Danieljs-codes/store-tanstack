@@ -250,7 +250,9 @@ const Section = ({
 						</>
 					)}
 					<DisclosurePanel>
-						<div className="grid grid-cols-[auto_1fr]">{props.children}</div>
+						<div className="grid grid-cols-[auto_1fr] gap-0.5">
+							{props.children}
+						</div>
 					</DisclosurePanel>
 				</>
 			)}

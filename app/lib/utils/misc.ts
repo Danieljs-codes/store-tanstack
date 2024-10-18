@@ -22,3 +22,13 @@ export function createContextFactory<Context>(
 
 	return [context.Provider, useContextFactory] as const;
 }
+
+// Add one decimal place to the price like 100 should be $100.00
+export const formatPrice = (price: number) => {
+	return price.toLocaleString("en-US", {
+		style: "currency",
+		currency: "USD",
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	});
+};

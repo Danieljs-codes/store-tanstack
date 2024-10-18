@@ -8,7 +8,13 @@ import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 import { routeTree } from "./routeTree.gen";
 
 export function createRouter() {
-	const queryClient = new QueryClient();
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				staleTime: 5 * 60 * 1000,
+			},
+		},
+	});
 	const router = createTanStackRouter({
 		routeTree,
 		defaultPreload: "intent",

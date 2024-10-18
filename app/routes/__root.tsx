@@ -1,5 +1,4 @@
 import { getToastCookie } from "@/server/actions/cookie";
-import { ClientHintCheck } from "@lib/utils/client-hints";
 import type { QueryClient } from "@tanstack/react-query";
 import {
 	Outlet,
@@ -65,7 +64,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<Html>
 			<Head>
-				<ClientHintCheck />
+				{/*<ClientHintCheck />*/}
 				<Meta />
 			</Head>
 			<Body>

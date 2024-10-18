@@ -1,6 +1,17 @@
 import { Logo } from "@/components/logo";
 import { protectRoute$ } from "@/server/actions/auth";
-import { Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
+import {
+	getStoreLast5Products$,
+	validateUserOwnsStore$,
+} from "@/server/actions/store";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+	Outlet,
+	createFileRoute,
+	linkOptions,
+	useLocation,
+} from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/start";
 import { Aside } from "@ui/aside";
 import { Avatar } from "@ui/avatar";
 import { Button } from "@ui/button";
@@ -21,36 +32,67 @@ import {
 } from "justd-icons";
 
 export const Route = createFileRoute("/store/$storeId/dashboard")({
-	loader: async () => {
+	loader: async ({ params, context }) => {
 		const { user, session } = await protectRoute$();
-		return { user, session };
+		await validateUserOwnsStore$({ storeId: params.storeId });
+		context.queryClient.ensureQueryData({
+			queryKey: ["store", params.storeId],
+			queryFn: () => getStoreLast5Products$({ storeId: params.storeId }),
+		});
+		return { user, session, storeId: params.storeId };
 	},
 	component: Dashboard,
 });
 
+const dashboardLink = linkOptions({
+	to: "/store/$storeId/dashboard",
+	from: "/store/$storeId/dashboard",
+});
+
+const productLink = linkOptions({
+	to: "/store/$storeId/dashboard/products",
+	from: "/store/$storeId/dashboard",
+	activeProps: {},
+});
+
+const orderLink = linkOptions({
+	to: "/store/$storeId/dashboard/orders",
+	from: "/store/$storeId/dashboard",
+});
+
+const discountLink = linkOptions({
+	to: "/store/$storeId/dashboard/discounts",
+	from: "/store/$storeId/dashboard",
+});
+
+const customerLink = linkOptions({
+	to: "/store/$storeId/dashboard/customers",
+	from: "/store/$storeId/dashboard",
+});
+
 const asideRoutes = [
 	{
-		path: "/",
+		path: dashboardLink.to,
 		label: "Overview",
 		icon: IconDashboard,
 	},
 	{
-		path: "/products",
+		path: productLink.to,
 		label: "Products",
 		icon: IconPackage,
 	},
 	{
-		path: "/orders",
+		path: orderLink.to,
 		label: "Orders",
 		icon: IconCart,
 	},
 	{
-		path: "/discounts",
+		path: discountLink.to,
 		label: "Discounts",
 		icon: IconPriceTag,
 	},
 	{
-		path: "/customers",
+		path: customerLink.to,
 		label: "Customers",
 		icon: IconContacts,
 	},
@@ -58,9 +100,16 @@ const asideRoutes = [
 
 function Dashboard() {
 	const location = useLocation();
-	const { user } = Route.useLoaderData();
+	const getLast5Products = useServerFn(getStoreLast5Products$);
+	const { user, storeId } = Route.useLoaderData();
+
+	const { data: products } = useSuspenseQuery({
+		queryKey: ["store", storeId],
+		queryFn: () => getLast5Products({ storeId }),
+	});
 
 	const theme = "light" as string;
+	// @ts-ignore
 	return (
 		<Aside.Layout
 			navbar={
@@ -93,9 +142,9 @@ function Dashboard() {
 						>
 							<Avatar
 								size="medium"
-								// src={user.image}
+								src={user.image}
 								alt="User Avatar"
-								// initials={user.name[0]}
+								initials={user.name[0]}
 							/>
 						</Button>
 						<Menu.Content placement="top" className="min-w-[--trigger-width]">
@@ -119,16 +168,37 @@ function Dashboard() {
 							{asideRoutes.map((route) => (
 								<Aside.Item
 									key={route.path}
-									// @ts-expect-error - TODO: Create routes to fix types
 									href={route.path}
 									icon={route.icon}
 									className="text-sm"
-									isCurrent={location.pathname.includes(route.path)}
+									isCurrent={
+										route.path === "/store/$storeId/dashboard"
+											? new RegExp(
+													`${route.path.replace("$storeId", "[^/]+")}$`,
+												).test(location.pathname)
+											: new RegExp(
+													route.path.replace("$storeId", "[^/]+"),
+												).test(location.pathname)
+									}
 								>
 									{route.label}
 								</Aside.Item>
 							))}
 						</Aside.Section>
+						{products.length > 0 && (
+							<Aside.Section
+								collapsible={true}
+								defaultExpanded={true}
+								title={"Latest Products"}
+							>
+								<Aside.Item
+									className={"text-sm"}
+									href={"/store/$storeId/dashboard/products"}
+								>
+									Product
+								</Aside.Item>
+							</Aside.Section>
+						)}
 					</Aside.Content>
 					<Aside.Footer className="lg:flex lg:flex-row hidden items-center">
 						<Menu>
@@ -141,11 +211,11 @@ function Dashboard() {
 									size={"small"}
 									shape="square"
 									className="-ml-1.5"
-									// src={user.image}
-									// initials={user.name[0]}
+									src={user.image}
+									initials={user.name[0]}
 									alt="User Avatar"
 								/>
-								{/*{user.name}*/}
+								{user.name}
 								<IconChevronLgDown className="right-3 absolute group-pressed:rotate-180 transition-transform" />
 							</Button>
 							<Menu.Content placement="top" className="min-w-[--trigger-width]">

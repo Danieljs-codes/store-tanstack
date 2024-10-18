@@ -17,7 +17,13 @@ import { Route as indexImport } from './routes/index'
 import { Route as authsignUpImport } from './routes/auth/sign-up'
 import { Route as authsignInImport } from './routes/auth/sign-in'
 import { Route as storedashboardImport } from './routes/store/dashboard'
+import { Route as storeproductsImport } from './routes/store/products'
+import { Route as storeordersImport } from './routes/store/orders'
+import { Route as storediscountsImport } from './routes/store/discounts'
+import { Route as storecustomersImport } from './routes/store/customers'
 import { Route as storedashboardIndexImport } from './routes/store/dashboard-index'
+import { Route as storeproductNewImport } from './routes/store/product-new'
+import { Route as storeproductsIndexImport } from './routes/store/products-index'
 
 // Create/Update Routes
 
@@ -51,9 +57,39 @@ const storedashboardRoute = storedashboardImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const storeproductsRoute = storeproductsImport.update({
+  path: '/products',
+  getParentRoute: () => storedashboardRoute,
+} as any)
+
+const storeordersRoute = storeordersImport.update({
+  path: '/orders',
+  getParentRoute: () => storedashboardRoute,
+} as any)
+
+const storediscountsRoute = storediscountsImport.update({
+  path: '/discounts',
+  getParentRoute: () => storedashboardRoute,
+} as any)
+
+const storecustomersRoute = storecustomersImport.update({
+  path: '/customers',
+  getParentRoute: () => storedashboardRoute,
+} as any)
+
 const storedashboardIndexRoute = storedashboardIndexImport.update({
   path: '/',
   getParentRoute: () => storedashboardRoute,
+} as any)
+
+const storeproductNewRoute = storeproductNewImport.update({
+  path: '/new',
+  getParentRoute: () => storeproductsRoute,
+} as any)
+
+const storeproductsIndexRoute = storeproductsIndexImport.update({
+  path: '/',
+  getParentRoute: () => storeproductsRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -109,6 +145,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof storedashboardIndexImport
       parentRoute: typeof storedashboardImport
     }
+    '/store/$storeId/dashboard/customers': {
+      id: '/store/$storeId/dashboard/customers'
+      path: '/customers'
+      fullPath: '/store/$storeId/dashboard/customers'
+      preLoaderRoute: typeof storecustomersImport
+      parentRoute: typeof storedashboardImport
+    }
+    '/store/$storeId/dashboard/discounts': {
+      id: '/store/$storeId/dashboard/discounts'
+      path: '/discounts'
+      fullPath: '/store/$storeId/dashboard/discounts'
+      preLoaderRoute: typeof storediscountsImport
+      parentRoute: typeof storedashboardImport
+    }
+    '/store/$storeId/dashboard/orders': {
+      id: '/store/$storeId/dashboard/orders'
+      path: '/orders'
+      fullPath: '/store/$storeId/dashboard/orders'
+      preLoaderRoute: typeof storeordersImport
+      parentRoute: typeof storedashboardImport
+    }
+    '/store/$storeId/dashboard/products': {
+      id: '/store/$storeId/dashboard/products'
+      path: '/products'
+      fullPath: '/store/$storeId/dashboard/products'
+      preLoaderRoute: typeof storeproductsImport
+      parentRoute: typeof storedashboardImport
+    }
+    '/store/$storeId/dashboard/products/': {
+      id: '/store/$storeId/dashboard/products/'
+      path: '/'
+      fullPath: '/store/$storeId/dashboard/products/'
+      preLoaderRoute: typeof storeproductsIndexImport
+      parentRoute: typeof storeproductsImport
+    }
+    '/store/$storeId/dashboard/products/new': {
+      id: '/store/$storeId/dashboard/products/new'
+      path: '/new'
+      fullPath: '/store/$storeId/dashboard/products/new'
+      preLoaderRoute: typeof storeproductNewImport
+      parentRoute: typeof storeproductsImport
+    }
   }
 }
 
@@ -128,12 +206,34 @@ const authlayoutRouteWithChildren = authlayoutRoute._addFileChildren(
   authlayoutRouteChildren,
 )
 
+interface storeproductsRouteChildren {
+  storeproductsIndexRoute: typeof storeproductsIndexRoute
+  storeproductNewRoute: typeof storeproductNewRoute
+}
+
+const storeproductsRouteChildren: storeproductsRouteChildren = {
+  storeproductsIndexRoute: storeproductsIndexRoute,
+  storeproductNewRoute: storeproductNewRoute,
+}
+
+const storeproductsRouteWithChildren = storeproductsRoute._addFileChildren(
+  storeproductsRouteChildren,
+)
+
 interface storedashboardRouteChildren {
   storedashboardIndexRoute: typeof storedashboardIndexRoute
+  storecustomersRoute: typeof storecustomersRoute
+  storediscountsRoute: typeof storediscountsRoute
+  storeordersRoute: typeof storeordersRoute
+  storeproductsRoute: typeof storeproductsRouteWithChildren
 }
 
 const storedashboardRouteChildren: storedashboardRouteChildren = {
   storedashboardIndexRoute: storedashboardIndexRoute,
+  storecustomersRoute: storecustomersRoute,
+  storediscountsRoute: storediscountsRoute,
+  storeordersRoute: storeordersRoute,
+  storeproductsRoute: storeproductsRouteWithChildren,
 }
 
 const storedashboardRouteWithChildren = storedashboardRoute._addFileChildren(
@@ -148,6 +248,12 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof authsignUpRoute
   '/store/$storeId/dashboard': typeof storedashboardRouteWithChildren
   '/store/$storeId/dashboard/': typeof storedashboardIndexRoute
+  '/store/$storeId/dashboard/customers': typeof storecustomersRoute
+  '/store/$storeId/dashboard/discounts': typeof storediscountsRoute
+  '/store/$storeId/dashboard/orders': typeof storeordersRoute
+  '/store/$storeId/dashboard/products': typeof storeproductsRouteWithChildren
+  '/store/$storeId/dashboard/products/': typeof storeproductsIndexRoute
+  '/store/$storeId/dashboard/products/new': typeof storeproductNewRoute
 }
 
 export interface FileRoutesByTo {
@@ -157,6 +263,11 @@ export interface FileRoutesByTo {
   '/sign-in': typeof authsignInRoute
   '/sign-up': typeof authsignUpRoute
   '/store/$storeId/dashboard': typeof storedashboardIndexRoute
+  '/store/$storeId/dashboard/customers': typeof storecustomersRoute
+  '/store/$storeId/dashboard/discounts': typeof storediscountsRoute
+  '/store/$storeId/dashboard/orders': typeof storeordersRoute
+  '/store/$storeId/dashboard/products': typeof storeproductsIndexRoute
+  '/store/$storeId/dashboard/products/new': typeof storeproductNewRoute
 }
 
 export interface FileRoutesById {
@@ -168,6 +279,12 @@ export interface FileRoutesById {
   '/_auth-layout-id/sign-up': typeof authsignUpRoute
   '/store/$storeId/dashboard': typeof storedashboardRouteWithChildren
   '/store/$storeId/dashboard/': typeof storedashboardIndexRoute
+  '/store/$storeId/dashboard/customers': typeof storecustomersRoute
+  '/store/$storeId/dashboard/discounts': typeof storediscountsRoute
+  '/store/$storeId/dashboard/orders': typeof storeordersRoute
+  '/store/$storeId/dashboard/products': typeof storeproductsRouteWithChildren
+  '/store/$storeId/dashboard/products/': typeof storeproductsIndexRoute
+  '/store/$storeId/dashboard/products/new': typeof storeproductNewRoute
 }
 
 export interface FileRouteTypes {
@@ -180,6 +297,12 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/store/$storeId/dashboard'
     | '/store/$storeId/dashboard/'
+    | '/store/$storeId/dashboard/customers'
+    | '/store/$storeId/dashboard/discounts'
+    | '/store/$storeId/dashboard/orders'
+    | '/store/$storeId/dashboard/products'
+    | '/store/$storeId/dashboard/products/'
+    | '/store/$storeId/dashboard/products/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +311,11 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/store/$storeId/dashboard'
+    | '/store/$storeId/dashboard/customers'
+    | '/store/$storeId/dashboard/discounts'
+    | '/store/$storeId/dashboard/orders'
+    | '/store/$storeId/dashboard/products'
+    | '/store/$storeId/dashboard/products/new'
   id:
     | '__root__'
     | '/'
@@ -197,6 +325,12 @@ export interface FileRouteTypes {
     | '/_auth-layout-id/sign-up'
     | '/store/$storeId/dashboard'
     | '/store/$storeId/dashboard/'
+    | '/store/$storeId/dashboard/customers'
+    | '/store/$storeId/dashboard/discounts'
+    | '/store/$storeId/dashboard/orders'
+    | '/store/$storeId/dashboard/products'
+    | '/store/$storeId/dashboard/products/'
+    | '/store/$storeId/dashboard/products/new'
   fileRoutesById: FileRoutesById
 }
 
@@ -256,12 +390,44 @@ export const routeTree = rootRoute
     "/store/$storeId/dashboard": {
       "filePath": "store\\dashboard.tsx",
       "children": [
-        "/store/$storeId/dashboard/"
+        "/store/$storeId/dashboard/",
+        "/store/$storeId/dashboard/customers",
+        "/store/$storeId/dashboard/discounts",
+        "/store/$storeId/dashboard/orders",
+        "/store/$storeId/dashboard/products"
       ]
     },
     "/store/$storeId/dashboard/": {
       "filePath": "store\\dashboard-index.tsx",
       "parent": "/store/$storeId/dashboard"
+    },
+    "/store/$storeId/dashboard/customers": {
+      "filePath": "store\\customers.tsx",
+      "parent": "/store/$storeId/dashboard"
+    },
+    "/store/$storeId/dashboard/discounts": {
+      "filePath": "store\\discounts.tsx",
+      "parent": "/store/$storeId/dashboard"
+    },
+    "/store/$storeId/dashboard/orders": {
+      "filePath": "store\\orders.tsx",
+      "parent": "/store/$storeId/dashboard"
+    },
+    "/store/$storeId/dashboard/products": {
+      "filePath": "store\\products.tsx",
+      "parent": "/store/$storeId/dashboard",
+      "children": [
+        "/store/$storeId/dashboard/products/",
+        "/store/$storeId/dashboard/products/new"
+      ]
+    },
+    "/store/$storeId/dashboard/products/": {
+      "filePath": "store\\products-index.tsx",
+      "parent": "/store/$storeId/dashboard/products"
+    },
+    "/store/$storeId/dashboard/products/new": {
+      "filePath": "store\\product-new.tsx",
+      "parent": "/store/$storeId/dashboard/products"
     }
   }
 }

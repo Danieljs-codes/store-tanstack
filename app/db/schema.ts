@@ -1,5 +1,11 @@
 import { createId } from "@paralleldrive/cuid2";
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+	boolean,
+	integer,
+	pgTable,
+	text,
+	timestamp,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
 	id: text()
@@ -22,7 +28,7 @@ export const session = pgTable("session", {
 	userAgent: text("userAgent"),
 	userId: text()
 		.notNull()
-		.references(() => user.id),
+		.references(() => user.id, { onDelete: "cascade" }),
 });
 
 export const account = pgTable("account", {
@@ -33,7 +39,7 @@ export const account = pgTable("account", {
 	providerId: text().notNull(),
 	userId: text()
 		.notNull()
-		.references(() => user.id),
+		.references(() => user.id, { onDelete: "cascade" }),
 	accessToken: text(),
 	refreshToken: text(),
 	idToken: text(),
@@ -65,7 +71,26 @@ export const store = pgTable("store", {
 		.$onUpdate(() => new Date()),
 	userId: text()
 		.notNull()
-		.references(() => user.id),
+		.references(() => user.id, { onDelete: "cascade" }),
+});
+
+export const product = pgTable("product", {
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => createId()),
+	name: text().notNull(),
+	description: text().notNull(),
+	price: integer().notNull(),
+	image: text().notNull(),
+	createdAt: timestamp({ mode: "date", withTimezone: true })
+		.notNull()
+		.defaultNow(),
+	updatedAt: timestamp({ withTimezone: true })
+		.notNull()
+		.$onUpdate(() => new Date()),
+	storeId: text()
+		.notNull()
+		.references(() => store.id, { onDelete: "cascade" }),
 });
 
 export default {
@@ -74,4 +99,5 @@ export default {
 	account,
 	verification,
 	store,
+	product,
 };

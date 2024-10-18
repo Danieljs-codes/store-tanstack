@@ -32,6 +32,7 @@ interface HeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 	title?: string;
 	description?: string;
 	withoutPadding?: boolean;
+	descriptionClassName?: string;
 }
 
 const Header = ({
@@ -39,6 +40,7 @@ const Header = ({
 	className,
 	title,
 	description,
+	descriptionClassName,
 	children,
 	...props
 }: HeaderProps) => (
@@ -49,7 +51,9 @@ const Header = ({
 		{...props}
 	>
 		{title && <Title>{title}</Title>}
-		{description && <Description>{description}</Description>}
+		{description && (
+			<Description className={descriptionClassName}>{description}</Description>
+		)}
 		{!title && typeof children === "string" ? (
 			<Title>{children}</Title>
 		) : (

@@ -68,7 +68,6 @@ export const signUp$ = createServerFn(
 				headers: ctx.request.headers,
 			});
 		} catch (error) {
-			console.log(error);
 			if (error instanceof APIError) {
 				// setResponseStatus(400);
 				return {
